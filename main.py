@@ -23,3 +23,8 @@ def web_search(query: str) -> str:
             return abstract or "\n".join(related) or "No results found"
     except:
         return "Search Unavailable"
+
+def save_report(filename: str, content: str) -> str:
+    with open(filename, "w") as f:
+        f.write(content)
+    return f"Search results saved to file - {filename}"
