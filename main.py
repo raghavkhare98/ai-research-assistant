@@ -12,7 +12,7 @@ OPENAI_KEY = os.environ.get('OPENAI_KEY')
 client = openai.OpenAI(api_key=OPENAI_KEY)
 
 def web_search(query: str) -> str:
-    if ["_", ".", "-", "~"] not in query:
+    if not any(char in query for char in ["_", ".", "-", "~"]):
         encoded_url = urllib.parse.quote(query)
         url = f"https://api.duckduckgo.com/?q={encoded_url}&format=json&no_html=1"
     try:
@@ -34,7 +34,7 @@ def get_date() -> str:
 
 tools = [
     {
-        "name": web_search,
+        "name": "web_search",
         "description": "Performs web search on a given query",
         "input_schema": {
             "type": "object",
@@ -47,7 +47,7 @@ tools = [
     {
         "name": "save_report",
         "description": "Save the result in a specified file",
-        "input_schem": {
+        "input_schema": {
             "type": "object",
             "properties": {
                 "filename": {"type": "string"},
