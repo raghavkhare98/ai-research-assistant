@@ -3,3 +3,6 @@
 
 #virtual env
 ai-personal-assistant-venv
+
+#output files
+output.txt
