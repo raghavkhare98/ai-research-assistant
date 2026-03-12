@@ -12,9 +12,9 @@ OPENAI_KEY = os.environ.get('OPENAI_KEY')
 client = openai.OpenAI(api_key=OPENAI_KEY)
 
 def web_search(query: str) -> str:
-    if not any(char in query for char in ["_", ".", "-", "~"]):
-        encoded_url = urllib.parse.quote(query)
-        url = f"https://api.duckduckgo.com/?q={encoded_url}&format=json&no_html=1"
+
+    encoded_url = urllib.parse.quote(query)
+    url = f"https://api.duckduckgo.com/?q={encoded_url}&format=json&no_html=1"
     try:
         with urllib.request.urlopen(url, timeout=5) as r:
             data = json.loads(r.read())
