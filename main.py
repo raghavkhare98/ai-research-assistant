@@ -31,3 +31,37 @@ def save_report(filename: str, content: str) -> str:
 
 def get_date() -> str:
     return datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+
+tools = [
+    {
+        "name": web_search,
+        "description": "Performs web search on a given query",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "query": {"type": "string"}
+            },
+            "required": ["query"]
+        }
+    },
+    {
+        "name": "save_report",
+        "description": "Save the result in a specified file",
+        "input_schem": {
+            "type": "object",
+            "properties": {
+                "filename": {"type": "string"},
+                "content": {"type": "string"}
+            },
+            "required": ["filename", "content"]
+        }
+    },
+    {
+        "name": "get_date",
+        "description": "Very straightforward. Gets the current date and time",
+        "input_schema":{
+            "type": "object",
+            "properties": {}
+        }
+    }
+]
