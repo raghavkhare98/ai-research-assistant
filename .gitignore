@@ -1,0 +1,5 @@
+#Env files
+.env
+
+#virtual env
+ai-personal-assistant-venv
