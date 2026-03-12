@@ -37,7 +37,7 @@ tools = [
         "type": "function",
         "name": "web_search",
         "description": "Performs web search on a given query",
-        "input_schema": {
+        "parameters": {
             "type": "object",
             "properties": {
                 "query": {"type": "string"}
@@ -49,7 +49,7 @@ tools = [
         "type": "function",
         "name": "save_report",
         "description": "Save the result in a specified file",
-        "input_schema": {
+        "parameters": {
             "type": "object",
             "properties": {
                 "filename": {"type": "string"},
@@ -62,7 +62,7 @@ tools = [
         "type": "function",
         "name": "get_date",
         "description": "Very straightforward. Gets the current date and time",
-        "input_schema":{
+        "parameters":{
             "type": "object",
             "properties": {}
         }
@@ -73,42 +73,41 @@ def run_agent(user_request: str, output_file_name:str):
 
     messages = [{"role": "user", "content": user_request}]
 
-    while True:
-        response = client.responses.create(
+    response = client.responses.create(
             model="gpt-4.1", 
             input=messages, 
             instructions="You are a research assistant. Use tools to gather information and save organized reports.", 
             tools=tools
         )
 
-        if response.status == "completed":
-            print("Agent finished")
-            print(response.output_text)
-            break
-        
-        tool_results = []
-        for tool in response.tools:
-            print(f"Calling tool {tool}")
+    # if response.status == "completed":
+    #     print("Agent finished")
+    #     print(response.output_text)
+    #     break
+    
+    tool_results = []
+    for tool in response.tools:
+        print(f"Calling tool {tool}")
 
-            if tool.name == "web_search":
-                result = web_search(user_request)
-            
-            elif tool.name == "save_report":
-                result = save_report(output_file_name, response.output_text)
-            
-            elif tool.name == "get_date":
-                result = get_date()
-            else:
-                result = "Unknown"
-
-            print(f".  -> {result[:100]}....")
-            tool_results.append({
-                "type": "tool_result",
-                "content": result
-            })
+        if tool.name == "web_search":
+            result = web_search(user_request)
         
-        messages.append({"role": "assistant", "content": response.output_text})
-        messages.append({"role": "user", "content": tool_results})
+        elif tool.name == "save_report":
+            result = save_report(output_file_name, response.output_text)
+        
+        elif tool.name == "get_date":
+            result = get_date()
+        else:
+            result = "Unknown"
+
+        print(f".  -> {result[:100]}....")
+        tool_results.append({
+            "type": "tool_result",
+            "content": result
+        })
+    
+    messages.append({"role": "assistant", "content": response.output_text})
+    messages.append({"role": "user", "content": tool_results})
 
 
 # msg = [{"role": "user", "content": "What's the day today"}]
