@@ -28,3 +28,6 @@ def save_report(filename: str, content: str) -> str:
     with open(filename, "w") as f:
         f.write(content)
     return f"Search results saved to file - {filename}"
+
+def get_date() -> str:
+    return datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
