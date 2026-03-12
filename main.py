@@ -69,49 +69,54 @@ tools = [
     }
 ]
 
-def run_agent(user_request: str, output_file_name:str):
+def run_agent(user_request: str):
 
     messages = [{"role": "user", "content": user_request}]
 
-    response = client.responses.create(
-            model="gpt-4.1", 
-            input=messages, 
-            instructions="You are a research assistant. Use tools to gather information and save organized reports.", 
-            tools=tools
+    while True:
+        response = client.responses.create(
+                model="gpt-4.1", 
+                input=messages, 
+                instructions="You are a research assistant. Use tools to gather information and save organized reports.", 
+                tools=tools
         )
 
-    # if response.status == "completed":
-    #     print("Agent finished")
-    #     print(response.output_text)
-    #     break
-    
-    tool_results = []
-    for tool in response.tools:
-        print(f"Calling tool {tool}")
-
-        if tool.name == "web_search":
-            result = web_search(user_request)
+        function_calls = [item for item in response.output if item.type == "function_call"]
+        if not function_calls:
+            print("Agent finished")
+            print(response.output_text)
+            break
         
-        elif tool.name == "save_report":
-            result = save_report(output_file_name, response.output_text)
-        
-        elif tool.name == "get_date":
-            result = get_date()
-        else:
-            result = "Unknown"
+        tool_results = []
+        for item in function_calls:
+            if item.type == "function_call":
+                args = json.loads(item.arguments)
+                print(f"Calling tool {item.name}({args})")
 
-        print(f".  -> {result[:100]}....")
-        tool_results.append({
-            "type": "tool_result",
-            "content": result
-        })
-    
-    messages.append({"role": "assistant", "content": response.output_text})
-    messages.append({"role": "user", "content": tool_results})
+                if item.name == "web_search":
+                    result = web_search(args["query"])
+                
+                elif item.name == "save_report":
+                    result = save_report(args["filename"], args["content"])
+                
+                elif item.name == "get_date":
+                    result = get_date()
+                else:
+                    result = "Unknown"
+
+                print(f"  -> {result[:100]}....")
+                tool_results.append({
+                    "type": "function_call_output",
+                    "call_id": item.call_id,
+                    "output": result
+                })
+            
+            messages += response.output
+            messages += tool_results
 
 
 # msg = [{"role": "user", "content": "What's the day today"}]
 # response = client.responses.create(model= "gpt-4.1",input = msg, tools=None)
 # print("\n", response)
 
-run_agent("Research the topic 'Model Context Protocol' and save a structured summary report as output.txt", "output.txt")
+run_agent("Research the topic 'Model Context Protocol' and save a structured summary report as output.txt")
