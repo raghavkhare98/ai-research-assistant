@@ -1,4 +1,4 @@
-# AI powered search result summarize
+# Summarize web search results using AI
 
 This tool is a very basic implementation of the MCP protocol. It contains the following things
 
